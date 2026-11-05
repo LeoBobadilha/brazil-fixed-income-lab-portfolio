@@ -1,0 +1,39 @@
+name: CI
+
+# Code path: test the pushed commit, then (on main only) deploy that exact commit.
+# Pull requests and manual runs on other branches test without deploying.
+# Data-refresh commits are pushed with GITHUB_TOKEN, which does not trigger this
+# workflow; refresh.yml tests and deploys them itself, so no commit is deployed twice.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
+    with:
+      ref: ${{ github.sha }}
+
+  pages:
+    name: Deploy tested commit
+    needs: tests
+    # Only the operational repository deploys; copies of this workflow only run the tests.
+    if: github.repository == 'LeoBobadilha/brazil-fixed-income-lab' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      deployments: read
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: ${{ github.sha }}
+      trigger: ${{ github.event_name == 'workflow_dispatch' && 'manual' || 'code' }}

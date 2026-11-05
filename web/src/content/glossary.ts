@@ -1,0 +1,30 @@
+// Plain-English definitions of the financial concepts used across the site.
+// Brazilian product and index names are kept and explained, not translated.
+
+export interface GlossaryEntry { term: string; definition: string; aka?: string[] }
+
+export const GLOSSARY: Record<string, GlossaryEntry> = {
+  bp: { term: "Basis point (bp)", definition: "One hundredth of a percentage point: a rate moving from 7.25% to 7.50% has risen 25 bp. Yield changes are quoted in bp because the moves that matter for bond prices are small." },
+  duration: { term: "Duration", definition: "The weighted-average time, in years, until a bond's cash flows are received, each flow weighted by its present value (Macaulay duration). The longer the duration, the more the price depends on distant cash flows and the more it reacts to yield changes." },
+  modified: { term: "Modified duration", definition: "Macaulay duration divided by (1 + yield). It approximates the percentage price change for a 1-percentage-point yield change: a modified duration of 8 means roughly -8% for +100 bp. It is a first-order approximation that works best for small moves." },
+  convexity: { term: "Convexity", definition: "How the price–yield relationship curves. Positive convexity means the price gains more when yields fall than it loses when yields rise by the same amount, so the duration approximation understates gains and overstates losses for large moves." },
+  dv01: { term: "DV01", definition: "Dollar value of one basis point: the change in a bond's price, here in reais per unit, for a 1 bp change in its yield. DV01 = modified duration x price x 0.0001." },
+  mtm: { term: "Mark-to-market", definition: "Valuing a position at the price it could be sold for today rather than at its purchase price or contractual value. A bond held to maturity pays its contracted cash flows, but its sale value before maturity moves with market yields." },
+  nominal: { term: "Nominal yield", definition: "A yield expressed in reais without adjusting for inflation, such as the fixed rate on Tesouro Prefixado. What it buys in the future depends on how much inflation occurs." },
+  real: { term: "Real yield", definition: "A yield above inflation. Tesouro IPCA+ pays IPCA inflation plus a fixed real rate, so a quote of 'IPCA + 7%' is a real yield and cannot be compared directly with a nominal rate." },
+  curve: { term: "Yield curve", definition: "Yields of comparable bonds plotted against their duration or maturity on one date. Its level, slope and shape summarise what the market requires to lend for different horizons." },
+  vna: { term: "VNA (Valor Nominal Atualizado)", definition: "The inflation-updated nominal value of an IPCA-linked bond (or the Selic-accumulated value of Tesouro Selic). It started at R$ 1,000 in July 2000 and grows with the index; prices are quoted as a percentage of it (the cotação)." },
+  coupon: { term: "Coupon payment", definition: "Interest paid before maturity. Tesouro Prefixado with semiannual coupons pays 10% p.a. on R$ 1,000; Tesouro IPCA+ with semiannual coupons pays 6% p.a. on the VNA, every six months." },
+  indexation: { term: "Inflation indexation", definition: "Linking a bond's principal and payments to a price index. Tesouro IPCA+, Renda+ and Educa+ are indexed to IPCA, so their payments keep their purchasing power if held to the payment dates." },
+  reinvestment: { term: "Reinvestment risk", definition: "The risk that coupons or instalments received before the horizon earn a lower rate than assumed. Scenario results here depend on the reinvestment rate you set." },
+  selic: { term: "Selic", definition: "Brazil's policy interest rate, set by the central bank's Monetary Policy Committee (Copom). Tesouro Selic pays the daily Selic rate plus or minus a small spread." },
+  cdi: { term: "CDI", definition: "The interbank deposit rate, which closely follows the effective Selic. Bank products such as CDBs are usually quoted as a percentage of CDI." },
+  ipca: { term: "IPCA", definition: "Brazil's official consumer price index, published monthly by IBGE and used as the inflation target measure and the index for Tesouro IPCA+, Renda+ and Educa+." },
+  sovereign: { term: "Sovereign debt", definition: "Debt issued by a national government. The Federal Public Debt (DPF) here is the federal government's securities and contracts held by the market." },
+  primary: { term: "Primary balance", definition: "Government revenue minus non-interest spending. A primary surplus means the government covers its spending before paying interest; the nominal balance also includes interest." },
+  grossnet: { term: "Gross vs net debt", definition: "Gross general government debt counts liabilities only; net public sector debt subtracts assets such as international reserves and covers a wider perimeter. The two have different coverage and should not be added or compared as if they were the same measure." },
+  percentile: { term: "Percentile", definition: "The share of past observations at or below today's value. A 90th percentile real yield is higher than 90% of history; it describes the past and does not predict the next move." },
+  breakeven: { term: "Breakeven inflation", definition: "The inflation rate at which a nominal and a real bond of similar duration earn the same, from (1 + nominal)/(1 + real) - 1. It includes risk premia, so it is not a pure inflation forecast." },
+  renda: { term: "Tesouro Renda+", definition: "An IPCA-linked bond (NTN-B1) that pays 240 equal monthly instalments of the inflation-updated principal, from January of the named year for 20 years. 'Renda+ 2065' starts paying in January 2065 and makes its last payment in December 2084, which is the date the official data lists as maturity." },
+  custody: { term: "B3 custody fee", definition: "A fee charged by the B3 exchange: 0.20% p.a. on the value of most Tesouro Direto bonds, accrued daily and collected at coupons, sales and maturity. Tesouro Selic is exempt up to R$ 10,000; Renda+ and Educa+ have their own rules." },
+}

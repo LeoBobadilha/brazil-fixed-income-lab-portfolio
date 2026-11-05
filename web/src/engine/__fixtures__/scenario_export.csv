@@ -1,0 +1,35 @@
+field,value,unit
+security_id,NTNBP-20350515,
+security_name,"IPCA+ 2035, ""zero-coupon""",
+reference_date,2026-10-30,ISO 8601 date
+data_as_of,2026-10-30,ISO 8601 date
+snapshot_id,test,
+assumptions_version,2026-11.2,
+buy_price,2509.91,BRL per unit
+buy_rate,7.88,% p.a.
+sell_rate,8,% p.a.
+vna,4771.175732,BRL
+amount,10000,BRL
+horizon_years,3,years
+shock,-50,bp
+inflation_assumption,4.5,% p.a.
+selic_assumption,13.75,% p.a.
+reinvestment_rate,13.75,% p.a.
+costs_applied,true,boolean
+taxes_applied,true,boolean
+custody_deducted_from_tax_base,false,boolean
+horizon_date,2029-10-30,ISO 8601 date
+held_to_maturity,false,boolean
+units,3.98420660501771,units
+exit_rate,7.5,% p.a.
+exit_price,3656.926051756496,BRL per unit
+sale_proceeds,14569.948929469567,BRL
+flows_received,0,BRL
+gross_value,14569.948929469567,BRL
+custody,72.79559631411593,BRL
+iof,0,BRL
+income_tax,685.492339420435,BRL
+net_value,13811.660993735017,BRL
+net_return_pa,11.362243907810932,% p.a.
+real_net_return_pa,6.566740581637265,% p.a.
+note,"Hypothetical scenario, not a forecast. Brazil Fixed Income Lab, https://leobobadilha.github.io/brazil-fixed-income-lab/",

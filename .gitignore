@@ -1,0 +1,39 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local data (rebuilt by the pipeline; raw files can be large)
+/data/
+logs/
+exports/
+reports/
+*.duckdb
+
+# Web
+web/node_modules/
+web/dist/
+web/test-results/
+web/playwright-report/
+web/.vite/
+web/public/.data-*
+
+# Secrets / environment
+.env
+.env.*
+*.pem
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Generated at deploy time from JUnit reports
+web/public/data/tests.json
+web/reports/
+web/tsconfig.tsbuildinfo
+
+# Written at deploy time: commit and run that produced the live site
+web/public/data/build.json

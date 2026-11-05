@@ -1,0 +1,519 @@
+{
+ "_source": "scripts/make_renda_lot_cases.py - independent hand arithmetic",
+ "cases": [
+  {
+   "id": "L1_single_lot_over_two_years",
+   "note": "Settled 03/11/2026, paid 15/01/2030: 1169 days -> 15%.",
+   "input": {
+    "pay_day": "2030-01-15",
+    "instalment_pct": 0.416666,
+    "vna_nominal": 5000.0,
+    "threshold_nominal": 1000000000000.0,
+    "lots": [
+     {
+      "settle": "2026-11-03",
+      "units": 10.0,
+      "cost_nominal": 19740.0
+     }
+    ]
+   },
+   "expected": {
+    "gross": 208.333,
+    "cost_returned": 82.2498684,
+    "income_tax": 18.91246974,
+    "custody": 0.0,
+    "net": 189.42053026,
+    "effective_tax_rate": 0.15,
+    "min_age_days": 1169,
+    "lots": [
+     {
+      "settle": "2026-11-03",
+      "units": 10.0,
+      "cost_nominal": 19740.0,
+      "age_days": 1169,
+      "rate": 0.15,
+      "payment": 208.333,
+      "cost_returned": 82.2498684,
+      "income_tax": 18.91246974
+     }
+    ]
+   }
+  },
+  {
+   "id": "L2_contribution_shortly_before_conversion",
+   "note": "Settled 03/12/2029, paid 15/01/2030: 43 days -> 22.5%.",
+   "input": {
+    "pay_day": "2030-01-15",
+    "instalment_pct": 0.416666,
+    "vna_nominal": 5000.0,
+    "threshold_nominal": 1000000000000.0,
+    "lots": [
+     {
+      "settle": "2029-12-03",
+      "units": 2.0,
+      "cost_nominal": 9000.0
+     }
+    ]
+   },
+   "expected": {
+    "gross": 41.666599999999995,
+    "cost_returned": 37.499939999999995,
+    "income_tax": 0.9374985000000001,
+    "custody": 0.0,
+    "net": 40.7291015,
+    "effective_tax_rate": 0.225,
+    "min_age_days": 43,
+    "lots": [
+     {
+      "settle": "2029-12-03",
+      "units": 2.0,
+      "cost_nominal": 9000.0,
+      "age_days": 43,
+      "rate": 0.225,
+      "payment": 41.666599999999995,
+      "cost_returned": 37.499939999999995,
+      "income_tax": 0.9374985000000001
+     }
+    ]
+   }
+  },
+  {
+   "id": "L3_lots_spanning_all_brackets",
+   "note": "Four lots aged 100/300/500/900 days -> 22.5/20/17.5/15%.",
+   "input": {
+    "pay_day": "2030-01-15",
+    "instalment_pct": 0.416666,
+    "vna_nominal": 5000.0,
+    "threshold_nominal": 1000000000000.0,
+    "lots": [
+     {
+      "settle": "2029-10-07",
+      "units": 1.0,
+      "cost_nominal": 4500.0
+     },
+     {
+      "settle": "2029-03-21",
+      "units": 1.5,
+      "cost_nominal": 6300.0
+     },
+     {
+      "settle": "2028-09-02",
+      "units": 2.0,
+      "cost_nominal": 8000.0
+     },
+     {
+      "settle": "2027-07-30",
+      "units": 4.0,
+      "cost_nominal": 14000.0
+     }
+    ]
+   },
+   "expected": {
+    "gross": 177.08304999999996,
+    "cost_returned": 136.666448,
+    "income_tax": 6.677072649999999,
+    "custody": 0.0,
+    "net": 170.40597734999997,
+    "effective_tax_rate": 0.1652061855670103,
+    "min_age_days": 100,
+    "lots": [
+     {
+      "settle": "2029-10-07",
+      "units": 1.0,
+      "cost_nominal": 4500.0,
+      "age_days": 100,
+      "rate": 0.225,
+      "payment": 20.833299999999998,
+      "cost_returned": 18.749969999999998,
+      "income_tax": 0.46874925000000006
+     },
+     {
+      "settle": "2029-03-21",
+      "units": 1.5,
+      "cost_nominal": 6300.0,
+      "age_days": 300,
+      "rate": 0.2,
+      "payment": 31.24995,
+      "cost_returned": 26.249957999999996,
+      "income_tax": 0.9999984000000005
+     },
+     {
+      "settle": "2028-09-02",
+      "units": 2.0,
+      "cost_nominal": 8000.0,
+      "age_days": 500,
+      "rate": 0.175,
+      "payment": 41.666599999999995,
+      "cost_returned": 33.33328,
+      "income_tax": 1.4583309999999987
+     },
+     {
+      "settle": "2027-07-30",
+      "units": 4.0,
+      "cost_nominal": 14000.0,
+      "age_days": 900,
+      "rate": 0.15,
+      "payment": 83.33319999999999,
+      "cost_returned": 58.333239999999996,
+      "income_tax": 3.749993999999999
+     }
+    ]
+   }
+  },
+  {
+   "id": "L4_bracket_boundaries",
+   "note": "Ages 180/181/360/361/720/721 days.",
+   "input": {
+    "pay_day": "2030-01-15",
+    "instalment_pct": 0.416666,
+    "vna_nominal": 5000.0,
+    "threshold_nominal": 1000000000000.0,
+    "lots": [
+     {
+      "settle": "2029-07-19",
+      "units": 1.0,
+      "cost_nominal": 4000.0
+     },
+     {
+      "settle": "2029-07-18",
+      "units": 1.0,
+      "cost_nominal": 4000.0
+     },
+     {
+      "settle": "2029-01-20",
+      "units": 1.0,
+      "cost_nominal": 4000.0
+     },
+     {
+      "settle": "2029-01-19",
+      "units": 1.0,
+      "cost_nominal": 4000.0
+     },
+     {
+      "settle": "2028-01-26",
+      "units": 1.0,
+      "cost_nominal": 4000.0
+     },
+     {
+      "settle": "2028-01-25",
+      "units": 1.0,
+      "cost_nominal": 4000.0
+     }
+    ]
+   },
+   "expected": {
+    "gross": 124.99979999999998,
+    "cost_returned": 99.99984,
+    "income_tax": 4.687492499999997,
+    "custody": 0.0,
+    "net": 120.31230749999999,
+    "effective_tax_rate": 0.18750000000000003,
+    "min_age_days": 180,
+    "lots": [
+     {
+      "settle": "2029-07-19",
+      "units": 1.0,
+      "cost_nominal": 4000.0,
+      "age_days": 180,
+      "rate": 0.225,
+      "payment": 20.833299999999998,
+      "cost_returned": 16.66664,
+      "income_tax": 0.9374984999999992
+     },
+     {
+      "settle": "2029-07-18",
+      "units": 1.0,
+      "cost_nominal": 4000.0,
+      "age_days": 181,
+      "rate": 0.2,
+      "payment": 20.833299999999998,
+      "cost_returned": 16.66664,
+      "income_tax": 0.8333319999999994
+     },
+     {
+      "settle": "2029-01-20",
+      "units": 1.0,
+      "cost_nominal": 4000.0,
+      "age_days": 360,
+      "rate": 0.2,
+      "payment": 20.833299999999998,
+      "cost_returned": 16.66664,
+      "income_tax": 0.8333319999999994
+     },
+     {
+      "settle": "2029-01-19",
+      "units": 1.0,
+      "cost_nominal": 4000.0,
+      "age_days": 361,
+      "rate": 0.175,
+      "payment": 20.833299999999998,
+      "cost_returned": 16.66664,
+      "income_tax": 0.7291654999999994
+     },
+     {
+      "settle": "2028-01-26",
+      "units": 1.0,
+      "cost_nominal": 4000.0,
+      "age_days": 720,
+      "rate": 0.175,
+      "payment": 20.833299999999998,
+      "cost_returned": 16.66664,
+      "income_tax": 0.7291654999999994
+     },
+     {
+      "settle": "2028-01-25",
+      "units": 1.0,
+      "cost_nominal": 4000.0,
+      "age_days": 721,
+      "rate": 0.15,
+      "payment": 20.833299999999998,
+      "cost_returned": 16.66664,
+      "income_tax": 0.6249989999999995
+     }
+    ]
+   }
+  },
+  {
+   "id": "L5_cost_allocation_across_lots",
+   "note": "Same age, different costs: tax follows each lot's own gain.",
+   "input": {
+    "pay_day": "2030-01-15",
+    "instalment_pct": 0.416666,
+    "vna_nominal": 5000.0,
+    "threshold_nominal": 1000000000000.0,
+    "lots": [
+     {
+      "settle": "2027-01-04",
+      "units": 3.0,
+      "cost_nominal": 3000.0
+     },
+     {
+      "settle": "2027-01-04",
+      "units": 3.0,
+      "cost_nominal": 13000.0
+     },
+     {
+      "settle": "2027-01-04",
+      "units": 3.0,
+      "cost_nominal": 15400.0
+     }
+    ]
+   },
+   "expected": {
+    "gross": 187.4997,
+    "cost_returned": 130.833124,
+    "income_tax": 8.749986,
+    "custody": 0.0,
+    "net": 178.74971399999998,
+    "effective_tax_rate": 0.15,
+    "min_age_days": 1107,
+    "lots": [
+     {
+      "settle": "2027-01-04",
+      "units": 3.0,
+      "cost_nominal": 3000.0,
+      "age_days": 1107,
+      "rate": 0.15,
+      "payment": 62.4999,
+      "cost_returned": 12.49998,
+      "income_tax": 7.499987999999999
+     },
+     {
+      "settle": "2027-01-04",
+      "units": 3.0,
+      "cost_nominal": 13000.0,
+      "age_days": 1107,
+      "rate": 0.15,
+      "payment": 62.4999,
+      "cost_returned": 54.166579999999996,
+      "income_tax": 1.249998
+     },
+     {
+      "settle": "2027-01-04",
+      "units": 3.0,
+      "cost_nominal": 15400.0,
+      "age_days": 1107,
+      "rate": 0.15,
+      "payment": 62.4999,
+      "cost_returned": 64.166564,
+      "income_tax": 0.0
+     }
+    ]
+   }
+  },
+  {
+   "id": "L6_renda_2065_mixed_lots",
+   "note": "Renda+ 2065: lots aged 13,000 days and 70 days.",
+   "input": {
+    "pay_day": "2065-01-15",
+    "instalment_pct": 0.416666,
+    "vna_nominal": 25000.0,
+    "threshold_nominal": 1000000000000.0,
+    "lots": [
+     {
+      "settle": "2029-06-13",
+      "units": 50.0,
+      "cost_nominal": 9000.0
+     },
+     {
+      "settle": "2064-11-06",
+      "units": 1.0,
+      "cost_nominal": 24000.0
+     }
+    ]
+   },
+   "expected": {
+    "gross": 5312.4915,
+    "cost_returned": 137.49978,
+    "income_tax": 776.5612574999999,
+    "custody": 0.0,
+    "net": 4535.9302425000005,
+    "effective_tax_rate": 0.15006038647342992,
+    "min_age_days": 70,
+    "lots": [
+     {
+      "settle": "2029-06-13",
+      "units": 50.0,
+      "cost_nominal": 9000.0,
+      "age_days": 13000,
+      "rate": 0.15,
+      "payment": 5208.325,
+      "cost_returned": 37.499939999999995,
+      "income_tax": 775.623759
+     },
+     {
+      "settle": "2064-11-06",
+      "units": 1.0,
+      "cost_nominal": 24000.0,
+      "age_days": 70,
+      "rate": 0.225,
+      "payment": 104.1665,
+      "cost_returned": 99.99984,
+      "income_tax": 0.9374984999999985
+     }
+    ]
+   }
+  },
+  {
+   "id": "L7_final_instalment",
+   "note": "Final instalment uses 0.416826%.",
+   "input": {
+    "pay_day": "2049-12-15",
+    "instalment_pct": 0.416826,
+    "vna_nominal": 9000.0,
+    "threshold_nominal": 1000000000000.0,
+    "lots": [
+     {
+      "settle": "2026-11-03",
+      "units": 10.0,
+      "cost_nominal": 19740.0
+     }
+    ]
+   },
+   "expected": {
+    "gross": 375.1434,
+    "cost_returned": 82.28145239999999,
+    "income_tax": 43.92929214,
+    "custody": 0.0,
+    "net": 331.21410786,
+    "effective_tax_rate": 0.15,
+    "min_age_days": 8443,
+    "lots": [
+     {
+      "settle": "2026-11-03",
+      "units": 10.0,
+      "cost_nominal": 19740.0,
+      "age_days": 8443,
+      "rate": 0.15,
+      "payment": 375.1434,
+      "cost_returned": 82.28145239999999,
+      "income_tax": 43.92929214
+     }
+    ]
+   }
+  },
+  {
+   "id": "L8_custody_below_threshold",
+   "note": "Payment below 6 minimum wages: no custody.",
+   "input": {
+    "pay_day": "2030-01-15",
+    "instalment_pct": 0.416666,
+    "vna_nominal": 5000.0,
+    "threshold_nominal": 9726.0,
+    "lots": [
+     {
+      "settle": "2026-11-03",
+      "units": 100.0,
+      "cost_nominal": 197400.0
+     }
+    ]
+   },
+   "expected": {
+    "gross": 2083.33,
+    "cost_returned": 822.4986839999999,
+    "income_tax": 189.1246974,
+    "custody": 0.0,
+    "net": 1894.2053025999999,
+    "effective_tax_rate": 0.15,
+    "min_age_days": 1169,
+    "lots": [
+     {
+      "settle": "2026-11-03",
+      "units": 100.0,
+      "cost_nominal": 197400.0,
+      "age_days": 1169,
+      "rate": 0.15,
+      "payment": 2083.33,
+      "cost_returned": 822.4986839999999,
+      "income_tax": 189.1246974
+     }
+    ]
+   }
+  },
+  {
+   "id": "L9_custody_above_threshold",
+   "note": "Payment above 6 minimum wages: 0.10% of the excess.",
+   "input": {
+    "pay_day": "2030-01-15",
+    "instalment_pct": 0.416666,
+    "vna_nominal": 5000.0,
+    "threshold_nominal": 9726.0,
+    "lots": [
+     {
+      "settle": "2026-11-03",
+      "units": 600.0,
+      "cost_nominal": 1184400.0
+     }
+    ]
+   },
+   "expected": {
+    "gross": 12499.98,
+    "cost_returned": 4934.992104,
+    "income_tax": 1134.7481844,
+    "custody": 2.7739799999999994,
+    "net": 11362.4578356,
+    "effective_tax_rate": 0.15,
+    "min_age_days": 1169,
+    "lots": [
+     {
+      "settle": "2026-11-03",
+      "units": 600.0,
+      "cost_nominal": 1184400.0,
+      "age_days": 1169,
+      "rate": 0.15,
+      "payment": 12499.98,
+      "cost_returned": 4934.992104,
+      "income_tax": 1134.7481844
+     }
+    ]
+   }
+  }
+ ],
+ "guards": [
+  {
+   "id": "G1_lot_within_30_days_rejected",
+   "pay_day": "2030-01-15",
+   "settle": "2029-12-17"
+  }
+ ]
+}

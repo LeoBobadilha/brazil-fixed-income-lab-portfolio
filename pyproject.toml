@@ -1,0 +1,10 @@
+[project]
+name = "brazil-fixed-income-lab"
+version = "1.0.0"
+description = "Treasury bonds, mark-to-market and macroeconomic research for Brazil"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

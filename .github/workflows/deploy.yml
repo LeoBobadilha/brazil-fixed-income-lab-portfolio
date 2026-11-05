@@ -1,0 +1,142 @@
+name: Deploy GitHub Pages
+
+# The single deployment path. It is only ever called after tests.yml has passed for the
+# same commit in the same run (from ci.yml or refresh.yml), and it:
+#   1. skips if the commit is no longer the head of main (the newer run deploys instead);
+#   2. builds that exact commit, embedding the test summary and data/build.json;
+#   3. deploys with one deploy-pages attempt (no blind retries);
+#   4. on failure, prints the Pages and deployment state for diagnosis;
+#   5. verifies that the live site serves build.json for this commit. An HTTP 200 alone
+#      is not accepted as proof of deployment.
+# Note: GitHub labels the Pages deployment with GITHUB_SHA (the commit that triggered the
+# run). For a data refresh this is the parent of the deployed data commit; build.json and
+# the verify job record the commit that was actually built.
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact commit SHA to build and deploy
+        type: string
+        required: true
+      trigger:
+        description: Why this deployment happened (code, data or manual)
+        type: string
+        required: false
+        default: code
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  deployments: read
+
+jobs:
+  build:
+    name: Build site for ${{ inputs.ref }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      current: ${{ steps.recheck.outputs.current }}
+    steps:
+      - name: Skip if the commit is no longer the head of main
+        id: guard
+        env: { GH_TOKEN: "${{ github.token }}", REF: "${{ inputs.ref }}" }
+        run: |
+          head=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)
+          echo "main head: $head  requested: $REF"
+          if [ "$head" = "$REF" ]; then echo "current=true" >> "$GITHUB_OUTPUT"
+          else echo "current=false" >> "$GITHUB_OUTPUT"
+               echo "::notice::Not deploying ${REF}: main has moved to ${head}; the run for that commit deploys it."; fi
+      - uses: actions/checkout@v7
+        if: steps.guard.outputs.current == 'true'
+        with: { ref: "${{ inputs.ref }}" }
+      - uses: actions/setup-node@v7
+        if: steps.guard.outputs.current == 'true'
+        with: { node-version: "22", cache: npm, cache-dependency-path: web/package-lock.json }
+      - uses: actions/setup-python@v7
+        if: steps.guard.outputs.current == 'true'
+        with: { python-version: "3.13" }
+      - name: Reuse the JUnit reports of the tests that ran for this commit
+        if: steps.guard.outputs.current == 'true'
+        uses: actions/download-artifact@v8
+        with: { name: pytest-junit, path: reports }
+      - if: steps.guard.outputs.current == 'true'
+        uses: actions/download-artifact@v8
+        with: { name: web-test-results, path: web }
+      - name: Write test summary and build record
+        if: steps.guard.outputs.current == 'true'
+        env: { REF: "${{ inputs.ref }}", TRIGGER: "${{ inputs.trigger }}" }
+        run: |
+          python scripts/write_test_summary.py reports/pytest.xml web/reports/vitest.xml web/reports/e2e-junit.xml
+          python scripts/write_build_info.py --commit "$REF" --trigger "$TRIGGER"
+          test "$(git rev-parse HEAD)" = "$REF"
+      - name: Build
+        if: steps.guard.outputs.current == 'true'
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+      - if: steps.guard.outputs.current == 'true'
+        uses: actions/configure-pages@v6
+      - if: steps.guard.outputs.current == 'true'
+        uses: actions/upload-pages-artifact@v5
+        with: { path: web/dist }
+      - name: Re-check that the commit is still the head of main
+        id: recheck
+        if: steps.guard.outputs.current == 'true'
+        env: { GH_TOKEN: "${{ github.token }}", REF: "${{ inputs.ref }}" }
+        run: |
+          head=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)
+          if [ "$head" = "$REF" ]; then echo "current=true" >> "$GITHUB_OUTPUT"
+          else echo "current=false" >> "$GITHUB_OUTPUT"
+               echo "::notice::main moved to ${head} during the build; that run deploys instead."; fi
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: needs.build.outputs.current == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # One deployment at a time across code and data runs. A newer pending deployment
+    # supersedes an older pending one; a running deployment is never cancelled.
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
+        with:
+          timeout: "600000"  # the action's maximum; a stall is diagnosed below, not retried
+      - name: Diagnose a failed deployment
+        if: failure()
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          echo "## Pages configuration"; gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '{status, build_type, html_url}' || true
+          echo "## Latest github-pages deployments"
+          for id in $(gh api "repos/${GITHUB_REPOSITORY}/deployments?environment=github-pages&per_page=3" --jq '.[].id'); do
+            gh api "repos/${GITHUB_REPOSITORY}/deployments/${id}" --jq '{id, sha, created_at}'
+            gh api "repos/${GITHUB_REPOSITORY}/deployments/${id}/statuses" --jq '.[] | {state, description, created_at}' || true
+          done
+          echo "Check https://www.githubstatus.com before re-running. Do not re-run repeatedly without a diagnosis."
+
+  verify:
+    name: Verify the live site serves this commit
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - env: { URL: "${{ needs.deploy.outputs.page_url }}", REF: "${{ inputs.ref }}" }
+        run: |
+          # Pages is served through a CDN (max-age 600 s); a run-specific query avoids a stale copy.
+          for i in $(seq 1 24); do
+            got=$(curl -fsS "${URL%/}/data/build.json?run=${GITHUB_RUN_ID}-${i}" | python3 -c "import json,sys; print(json.load(sys.stdin).get('commit',''))" || true)
+            echo "attempt ${i}: live build.json commit=${got:-<none>}"
+            if [ "$got" = "$REF" ]; then echo "Live site serves ${REF}."; exit 0; fi
+            sleep 25
+          done
+          echo "::error::The live site does not serve ${REF} after 10 minutes."; exit 1

@@ -1,0 +1,73 @@
+# Official data sources. All are free, unauthenticated, open-data endpoints.
+# Licence notes: Tesouro Transparente and BCB Dados Abertos publish under the
+# Open Database License (ODbL); IBGE data are public with attribution.
+
+[defaults]
+timeout_seconds = 90
+max_attempts = 5
+backoff_base_seconds = 2.0
+backoff_max_seconds = 60.0
+user_agent = "brazil-fixed-income-lab/1.0 (+https://github.com/LeoBobadilha/brazil-fixed-income-lab-portfolio)"
+
+# Freshness thresholds shared by the pipeline and the website (single source of truth).
+[freshness]
+quotes_max_business_days = 4      # Tesouro Direto publishes each business day's rates on the next business day
+daily_max_business_days = 5       # SGS daily series (Selic, CDI)
+weekly_max_calendar_days = 14     # Focus survey (weekly)
+monthly_max_calendar_days = 75    # monthly series (IPCA, fiscal, DPF stock) are published with a 1-2 month lag
+
+[sources.tesouro_direto_prices]
+description = "Tesouro Direto daily buy/sell rates and prices (Taxas dos Titulos Ofertados pelo Tesouro Direto)"
+publisher = "Tesouro Nacional / Tesouro Transparente"
+licence = "ODbL-1.0"
+landing = "https://www.tesourotransparente.gov.br/ckan/dataset/taxas-dos-titulos-ofertados-pelo-tesouro-direto"
+url = "https://www.tesourotransparente.gov.br/ckan/dataset/df56aa42-484a-4a59-8184-7676580c81e3/resource/796d2059-14e9-44e3-80c9-2d9e30b405c1/download/precotaxatesourodireto.csv"
+ckan_package = "taxas-dos-titulos-ofertados-pelo-tesouro-direto"
+format = "csv"
+refresh = "daily (business days)"
+
+[sources.dpf_stock]
+description = "Federal public debt stock by security, month-end (Estoque da Divida Publica Federal)"
+publisher = "Tesouro Nacional / Tesouro Transparente"
+licence = "ODbL-1.0"
+landing = "https://www.tesourotransparente.gov.br/ckan/dataset/estoque-da-divida-publica-federal"
+url = "https://www.tesourotransparente.gov.br/ckan/dataset/0998f610-bc25-4ce3-b32c-a873447500c2/resource/b6280ed3-ef7e-4569-954a-bded97c2c8a1/download/estoquedpf.csv"
+ckan_package = "estoque-da-divida-publica-federal"
+format = "csv"
+refresh = "monthly"
+
+[sources.ipca_index]
+description = "IPCA number index (base Dec/1993 = 100), SIDRA table 1737 variable 2266"
+publisher = "IBGE"
+licence = "Public data, attribution required"
+landing = "https://sidra.ibge.gov.br/tabela/1737"
+url = "https://apisidra.ibge.gov.br/values/t/1737/n1/all/v/2266/p/all"
+format = "json"
+refresh = "monthly"
+
+[sources.focus_annual]
+description = "BCB Focus market expectations, annual horizons (IPCA, Selic)"
+publisher = "Banco Central do Brasil"
+licence = "ODbL-1.0"
+landing = "https://dadosabertos.bcb.gov.br/dataset/expectativas-mercado"
+url = "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais"
+format = "odata"
+refresh = "weekly (Mondays)"
+
+# BCB SGS time series (https://api.bcb.gov.br/dados/serie/bcdata.sgs.{id}/dados)
+[sgs]
+publisher = "Banco Central do Brasil - SGS"
+licence = "ODbL-1.0"
+landing = "https://dadosabertos.bcb.gov.br/"
+
+[sgs.series]
+selic_target = { id = 432, unit = "% p.a.", frequency = "daily", title = "Meta Selic definida pelo Copom" }
+selic_effective = { id = 1178, unit = "% p.a. (252)", frequency = "daily", title = "Taxa Selic anualizada base 252" }
+selic_daily = { id = 11, unit = "% p.d.", frequency = "daily", title = "Taxa Selic diaria" }
+cdi_annual = { id = 4389, unit = "% p.a. (252)", frequency = "daily", title = "Taxa CDI anualizada base 252" }
+ipca_monthly = { id = 433, unit = "% m/m", frequency = "monthly", title = "IPCA - variacao mensal" }
+ipca_12m = { id = 13522, unit = "% 12m", frequency = "monthly", title = "IPCA - acumulado em 12 meses" }
+gross_debt_gdp = { id = 13762, unit = "% GDP", frequency = "monthly", title = "Divida bruta do governo geral (% PIB) - metodologia a partir de 2008" }
+net_debt_gdp = { id = 4513, unit = "% GDP", frequency = "monthly", title = "Divida liquida do setor publico (% PIB) - setor publico consolidado" }
+primary_balance_12m = { id = 5793, unit = "% GDP (NFSP, + = deficit)", frequency = "monthly", title = "NFSP sem desvalorizacao cambial - resultado primario - 12 meses - setor publico consolidado" }
+nominal_balance_12m = { id = 5727, unit = "% GDP (NFSP, + = deficit)", frequency = "monthly", title = "NFSP sem desvalorizacao cambial - resultado nominal - 12 meses - setor publico consolidado" }

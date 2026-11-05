@@ -1,0 +1,160 @@
+{
+ "_source": "scripts/make_reference_cases.py - independent hand arithmetic; see formulas",
+ "cases": [
+  {
+   "id": "R1_selic_exemption_constant_value",
+   "input": {
+    "product_code": "LFT",
+    "maturity": "2031-03-01",
+    "valuation_date": "2026-10-30",
+    "buy_price": 20000.0,
+    "buy_rate": 0.0,
+    "sell_rate": 0.0,
+    "vna0": 20000.0,
+    "amount": 50000.0,
+    "horizon_years": 1.0,
+    "shock_bp": 0.0,
+    "inflation_pa": 0.0,
+    "selic_pa": 0.0,
+    "reinvest_pa": 0.0,
+    "apply_costs": true,
+    "apply_taxes": true
+   },
+   "expected": {
+    "horizon_date": "2027-11-01",
+    "sale_proceeds": 50000.0,
+    "custody": 79.56164383561644,
+    "income_tax": 0.0,
+    "iof": 0.0,
+    "net_value": 49920.438356164384,
+    "purchase_settlement": "2026-11-03",
+    "tax_holding_days": 363
+   },
+   "formula": "custody = 0.002 x (50000 - 10000) x 363/365; sale = units x VNA = amount (zero spread, zero Selic); gain 0 -> no tax"
+  },
+  {
+   "id": "R2_ntnb_custody_and_tax_at_coupons",
+   "input": {
+    "product_code": "NTNB",
+    "maturity": "2035-05-15",
+    "valuation_date": "2026-10-30",
+    "buy_price": 7354.2440639999995,
+    "buy_rate": 0.0,
+    "sell_rate": 0.0,
+    "vna0": 4800.0,
+    "amount": 100000.0,
+    "horizon_years": 9.0,
+    "shock_bp": 0.0,
+    "inflation_pa": 0.0,
+    "selic_pa": 0.0,
+    "reinvest_pa": 0.0,
+    "apply_costs": true,
+    "apply_taxes": true
+   },
+   "expected_events": [
+    {
+     "date": "2026-11-15",
+     "cash": 1929.531393914859,
+     "custody": 6.575342465753424,
+     "income_tax": 434.1445636308433
+    },
+    {
+     "date": "2027-05-15",
+     "cash": 1929.531393914859,
+     "custody": 97.26440996000771,
+     "income_tax": 385.90627878297187
+    }
+   ],
+   "formula": "custody_k = 0.002 x value_before_payment x days_since_previous_collection/365; tax_k = bracket(days since purchase) x coupon (custody not deducted from the IR base by default)"
+  },
+  {
+   "id": "R3_renda_first_instalment",
+   "input": {
+    "product_code": "RENDA",
+    "maturity": "2049-12-15",
+    "valuation_date": "2026-10-30",
+    "buy_price": 1974.0,
+    "buy_rate": 7.5,
+    "sell_rate": 7.62,
+    "vna0": 4771.18,
+    "amount": 10000.0,
+    "horizon_years": 30.0,
+    "shock_bp": 0.0,
+    "inflation_pa": 4.0,
+    "selic_pa": 12.0,
+    "reinvest_pa": 0.0,
+    "apply_costs": true,
+    "apply_taxes": true
+   },
+   "expected_events": [
+    {
+     "date": "2030-01-15",
+     "cash": 114.22713076826054,
+     "custody": 0.0,
+     "income_tax": 10.884079615239083
+    }
+   ],
+   "formula": "cash = units x 4771.18 x 1.04^(days/365.25) x 0.416666/100; tax = 15% x (cash - 10000 x 0.416666/100); custody = 0.1% of the excess over 6 x 1621 x 1.04^(days/365.25)"
+  },
+  {
+   "id": "R4_renda_early_redemption_tier",
+   "input": {
+    "product_code": "RENDA",
+    "maturity": "2084-12-15",
+    "valuation_date": "2026-10-30",
+    "buy_price": 4800.0,
+    "buy_rate": 0.0,
+    "sell_rate": 0.0,
+    "vna0": 4800.0,
+    "amount": 10000.0,
+    "horizon_years": 5.0,
+    "shock_bp": 0.0,
+    "inflation_pa": 0.0,
+    "selic_pa": 0.0,
+    "reinvest_pa": 0.0,
+    "apply_costs": true,
+    "apply_taxes": true
+   },
+   "expected": {
+    "horizon_date": "2031-10-30",
+    "sale_proceeds": 10000.0,
+    "custody": 249.5890410958904,
+    "income_tax": 0.0,
+    "iof": 0.0,
+    "net_value": 9750.410958904109
+   },
+   "formula": "sale = units x VNA0 = 10000; custody = 0.005 x 1822/365 x 10000; gain 0 -> no tax"
+  },
+  {
+   "id": "R5_ltn_iof_short_sale",
+   "input": {
+    "product_code": "LTN",
+    "maturity": "2032-01-01",
+    "valuation_date": "2026-10-30",
+    "buy_price": 990.0,
+    "buy_rate": 0.0,
+    "sell_rate": 0.0,
+    "vna0": null,
+    "amount": 10000.0,
+    "horizon_years": 0.02737850787132101,
+    "shock_bp": 0.0,
+    "inflation_pa": 0.0,
+    "selic_pa": 0.0,
+    "reinvest_pa": 0.0,
+    "apply_costs": true,
+    "apply_taxes": true
+   },
+   "expected": {
+    "horizon_date": "2026-11-09",
+    "sale_proceeds": 10101.0101010101,
+    "custody": 0.33208800332088,
+    "iof": 80.80808080808056,
+    "income_tax": 4.545454545454531,
+    "net_value": 10015.324477653245,
+    "purchase_settlement": "2026-11-03",
+    "tax_holding_days": 6
+   },
+   "formula": "IOF = 80% x gain (6 days between settlements); IR = 22.5% x (gain - IOF); custody = 0.002 x units x 1000 x 6/365 (not deducted from the IR base)"
+  }
+ ]
+}
